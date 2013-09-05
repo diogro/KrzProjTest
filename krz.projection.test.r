@@ -1,6 +1,6 @@
 source("~/projects/lem-usp-R/matrix.func.r")
 require(plyr)
-require(qdata)
+require(gdata)
 require(ggplot2)
 require(reshape2)
 library(doMC)
@@ -29,4 +29,3 @@ CompareToNCor <- function(n) laply(random.matrices[-n], function(x) {KrzCor(x, r
 comparisons.cor  <- alply(1:100, 1, CompareToNCor, .progress="text")
 comparisons.cor  <-  melt(comparisons.cor)
 qplot(value, data=comparisons.cor, geom="histogram")
-
