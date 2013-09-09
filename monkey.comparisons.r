@@ -13,7 +13,10 @@ raw.hipot = read.table("./hipoteses.funcionais.csv", header = F, sep = '\t', as.
 hipoteses = list(Neuroface = as.matrix(raw.hipot[1:39,1:39]), All = as.matrix(raw.hipot[40:78,1:39]))
 mat.list = c(cov.matrices, hipoteses)
 
-MultiKrzProjection  <- function(mat.list, ret.dim.1 = NULL, ret.dim.2 = NULL, num.cores = 1){
+MultiKrzProjection <- function(mat.list,
+                               ret.dim.1 = NULL, ret.dim.2 = NULL,
+                               num.cores = 1,
+                               full.results = F){
     require(plyr)
     require(reshape2)
     if (num.cores > 1) {
@@ -24,17 +27,35 @@ MultiKrzProjection  <- function(mat.list, ret.dim.1 = NULL, ret.dim.2 = NULL, nu
     }
     else
         parallel = FALSE
-    CompareToNProj <- function(n) laply(mat.list[-n],
+    if(full.results){
+    CompareToNProj <- function(n) llply(mat.list,
+                                        function(x) {KrzProjection(x,
+                                                                   mat.list[[n]],
+                                                                   ret.dim.1, ret.dim.2)},
+                                        .parallel = parallel)
+    }
+    else{
+    CompareToNProj <- function(n) llply(mat.list[names(mat.list) != n],
                                         function(x) {KrzProjection(x,
                                                                    mat.list[[n]],
                                                                    ret.dim.1, ret.dim.2)[1]},
                                         .parallel = parallel)
-    comparisons.proj  <- alply(1:length(mat.list), 1,
+    }
+    comparisons.proj  <- llply(names(mat.list),
                                CompareToNProj,
                                .progress="text", .parallel = parallel)
-    comparisons.proj  <-  melt(comparisons.proj)
-    return(comparisons.proj)
+    if(full.results){
+        names(comparisons.proj) = names(mat.list)
+        return(comparisons.proj)
+    }
+    else{
+        comparisons.proj <- melt(comparisons.proj)
+        comparisons.proj[,4] = names(mat.list)[(comparisons.proj[,4])]
+    }
+    return(comparisons.proj[,-2])
 }
 
-comparisons.proj = MultiKrzProjection(mat.list, num.cores = 12 )
+
+comparisons.cor = MultiKrzCor(cov.matrices)
+comparisons.proj = MultiKrzProjection(cov.matrices, num.cores = 12, full.results = F)
 qplot(value, data = comparisons.proj, geom = "histogram")
