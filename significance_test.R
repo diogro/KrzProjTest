@@ -43,6 +43,23 @@ KPS_RandomMatrix <- function(x, y, iterations = 100){
 
 ## 3) Shuffled eigenvectors
 
+KPS_ShuffleEigenVector <- function(x, y, iterations = 100){
+    n = dim(x)[1]
+    obs_sim <- KrzProjection(x, y)[[1]]
+    eigen_x <- eigen(x)
+    eigen_y <- eigen(y)
+    randomCompFunc = function(index){
+        shuffle_x = sample(1:n, n)
+        shuffle_y = sample(1:n, n)
+        rand_x = t(eigen_x$vectors[,shuffle_x]) %*% diag(eigen_x$values) %*% eigen_x$vectors[,shuffle_x]
+        rand_y = t(eigen_y$vectors[,shuffle_y]) %*% diag(eigen_y$values) %*% eigen_y$vectors[,shuffle_y]
+        KrzProjection(rand_x, rand_y)[[1]]
+    }
+    random_comps = aaply(1:iterations, 1, randomCompFunc)
+    significance <- sum(random_comps > obs_sim)/iterations
+    return(c(SharedVariance = obs_sim, Prob = significance))
+}
+
 
 ## Null hipotesis is similarity
 
