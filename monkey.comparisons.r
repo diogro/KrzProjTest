@@ -5,6 +5,7 @@ library(doMC)
 registerDoMC(12)
 library(Morphometrics)
 
+
 load("~/Dropbox/labbio/cov_bayes_data/Rdatas/nwm.Rdata")
 cov.matrices = lapply(nwm.matrices, function(x) x[[1]])
 raw.hipot = read.table("./hipoteses.funcionais.csv", header = F, sep = '\t', as.is = T)
@@ -28,7 +29,7 @@ x <- RandomMatrix(10)
 y <- RandomMatrix(10)
 x <- cov.matrices[[1]]
 y <- cov.matrices[[2]]
-KPS_Random <- function(x, y, iterations = 100){
+KPS_RandomMatrix <- function(x, y, iterations = 100){
     obs_sim <- KrzProjection(x, y)[[1]]
     dx <- diag(x)
     dy <- diag(y)
