@@ -65,7 +65,6 @@ KPS_ShuffleEigenVector <- function(x, y, iterations = 100){
 
 ## 1) Random populations are shuffled
 
-
 KPS_ShufflePop = function(x, y, sample.x = 100, sample.y = 100, iterations = 100) {
     n = dim(x)[1]
     obs_sim <- KrzProjection(x, y)[[1]]
