@@ -38,3 +38,12 @@ KPS_RandomMatrix <- function(x, y, iterations = 100){
     return(c(SharedVariance = obs_sim, Prob = significance))
 }
 
+## 2) Random EigenVectors
+
+
+## 3) Shuffled eigenvectors
+
+
+## Null hipotesis is similarity
+
+## 1) Random populations are shuffled
