@@ -31,10 +31,8 @@ x <- cov.matrices[[1]]
 y <- cov.matrices[[2]]
 KPS_RandomMatrix <- function(x, y, iterations = 100){
     obs_sim <- KrzProjection(x, y)[[1]]
-    dx <- diag(x)
-    dy <- diag(y)
-    rand_mats_x <- RandomMatrix(dim(x)[[1]], iterations, min(dx), max(dx))
-    rand_mats_y <- RandomMatrix(dim(y)[[1]], iterations, min(dy), max(dy))
+    rand_mats_x <- RandomMatrix(dim(x)[[1]], iterations, variance = diag(x))
+    rand_mats_y <- RandomMatrix(dim(y)[[1]], iterations, variance = diag(y))
     random_comps <- unlist(Map(function(x, y) KrzProjection(x, y)[[1]], rand_mats_x, rand_mats_y))
     significance <- sum(random_comps > obs_sim)/iterations
     return(c(SharedVariance = obs_sim, Prob = significance))
