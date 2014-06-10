@@ -39,7 +39,16 @@ KPS_RandomMatrix <- function(x, y, iterations = 100){
 }
 
 ## 2) Random EigenVectors
-
+x <- RandomMatrix(10)
+KPS_RandomEV <- function(x, iterations = 100) {
+    evals <- diag(eigen(x)$values)
+    dim_x <- dim(x)[[1]]
+    rand_mats <- Map(function (m) qr.Q(qr(x)), 1:dim_x)
+    rand_covs <- Map(function (m) t(m) %*% evals %*% m, rand_mats)
+    random_comps <- unlist(Map(function(y) KrzProjection(x, y)[[1]], rand_covs))
+#    significance <- sum(random_comps > obs_sim)/iterations
+#    return(c(SharedVariance = obs_sim, Prob = significance))
+}
 
 ## 3) Shuffled eigenvectors
 
