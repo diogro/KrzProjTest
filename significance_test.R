@@ -30,13 +30,17 @@ KPS_RandomMatrix <- function(x, y, iterations = 100){
 
 ## 2) Random EigenVectors
 
-KPS_RandomEV <- function(x, y, iterations = 100){
+KPS_RandomEV <- function(x, y, iterations = 100, size = TRUE){
     obs_sim <- KrzProjection(x, y)[[1]]
+    n = dim(x)[1]
     evals <- diag(eigen(x)$values)
-    dim_x <- dim(x)[[1]]
-    rand_mats <- Map(function (m) qr.Q(qr(x)), 1:dim_x)
-    rand_covs <- Map(function (m) t(m) %*% evals %*% m, rand_mats)
-    random_comps <- unlist(Map(function(rm) KrzProjection(rm, y)[[1]], rand_covs))
+    randomCompFunc = function(index){
+        if(size) random_eVecs = qr.Q(qr(matrix(c(rep(1, n), rnorm(n*(n-1))), n, n)))
+        else     random_eVecs = qr.Q(qr(matrix(rnorm(n*n), n, n)))
+        rand_x =  t(random_eVecs) %*% evals %*% random_eVecs
+        KrzProjection(rand_x, y)[[1]]
+    }
+    random_comps = aaply(1:iterations, 1, randomCompFunc)
     significance <- sum(random_comps > obs_sim)/iterations
     return(c(SharedVariance = obs_sim, Prob = significance))
 }
