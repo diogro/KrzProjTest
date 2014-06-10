@@ -23,7 +23,7 @@ KPS_RandomMatrix <- function(x, y, iterations = 100){
         rand_y <- RandomMatrix(dim(y)[[1]], variance = diag(y))
         KrzProjection(rand_x, rand_y)[[1]]
     }
-    random_comps = aaply(1:iterations, 1, randomCompFunc)
+    random_comps = aaply(1:iterations, 1, randomCompFunc, .parallel = TRUE)
     significance <- sum(random_comps > obs_sim)/iterations
     return(c(SharedVariance = obs_sim, Prob = significance))
 }
@@ -40,7 +40,7 @@ KPS_RandomEV <- function(x, y, iterations = 100, size = TRUE){
         rand_x =  t(random_eVecs) %*% evals %*% random_eVecs
         KrzProjection(rand_x, y)[[1]]
     }
-    random_comps = aaply(1:iterations, 1, randomCompFunc)
+    random_comps = aaply(1:iterations, 1, randomCompFunc, .parallel = TRUE)
     significance <- sum(random_comps > obs_sim)/iterations
     return(c(SharedVariance = obs_sim, Prob = significance))
 }
@@ -59,7 +59,7 @@ KPS_ShuffleEigenVector <- function(x, y, iterations = 100){
         rand_y = t(eigen_y$vectors[,shuffle_y]) %*% diag(eigen_y$values) %*% eigen_y$vectors[,shuffle_y]
         KrzProjection(rand_x, rand_y)[[1]]
     }
-    random_comps = aaply(1:iterations, 1, randomCompFunc)
+    random_comps = aaply(1:iterations, 1, randomCompFunc, .parallel = TRUE)
     significance <- sum(random_comps > obs_sim)/iterations
     return(c(SharedVariance = obs_sim, Prob = significance))
 }
@@ -83,7 +83,7 @@ KPS_ShufflePop = function(x, y, sample.x = 100, sample.y = 100, iterations = 100
         rand.P = dlply(pop, .(pop), function(x) cov(x[-dim(x)[2]]))
         KrzProjection(rand.P)[1,2]
     }
-    random_comps = aaply(1:iterations, 1, randomCompFunc)
+    random_comps = aaply(1:iterations, 1, randomCompFunc, .parallel = TRUE)
     significance <- sum(random_comps < obs_sim)/iterations
     return(c(SharedVariance = obs_sim, Prob = significance))
 }
