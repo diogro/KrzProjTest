@@ -47,3 +47,23 @@ KPS_RandomMatrix <- function(x, y, iterations = 100){
 ## Null hipotesis is similarity
 
 ## 1) Random populations are shuffled
+
+
+KPS_ShufflePop = function(x, y, sample.x = 100, sample.y = 100, iterations = 100) {
+    n = dim(x)[1]
+    obs_sim <- KrzProjection(x, y)[[1]]
+    randomCompFunc = function(index){
+        pop_x = data.frame(mvtnorm::rmvnorm(n = sample.x, sigma = x))
+        pop_x$'pop' = 'x'
+        pop_y = data.frame(mvtnorm::rmvnorm(n = sample.y, sigma = y))
+        pop_y$'pop' = 'y'
+        pop = rbind(pop_x, pop_y)
+        shuffle = sample(dim(pop)[1])
+        pop$'pop' = pop$'pop'[shuffle]
+        rand.P = dlply(pop, .(pop), function(x) cov(x[-dim(x)[2]]))
+        KrzProjection(rand.P)[1,2]
+    }
+    random_comps = aaply(1:iterations, 1, randomCompFunc)
+    significance <- sum(random_comps < obs_sim)/iterations
+    return(c(SharedVariance = obs_sim, Prob = significance))
+}
