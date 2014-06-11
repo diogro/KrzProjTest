@@ -14,16 +14,18 @@ cov.matrices = lapply(nwm.matrices, function(x) x[[1]])
 
 KrzProjSignificance <- function(x, y, randomCompFunc = c("RandomMat", "RandomEV", "ShuffleEV", "ShufflePop"), ..., iterations = 100){
     randomCompFunc = match.arg(randomCompFunc)
+    n = dim(x)[1]
     if(randomCompFunc == "ShuffleEV"){
         eigen_x <- eigen(x)
         eigen_y <- eigen(y)
     }
     if(randomCompFunc == "RandomEV"){
-        evals <- eigen(x)$values
+        evals <- diag(eigen(x)$values)
     }
     obs_sim <- KrzProjection(x, y)[[1]]
     randomCompFunc = match.fun(randomCompFunc)
-    random_comps = aaply(1:iterations, 1, randomCompFunc, x, y, ..., .parallel = TRUE)
+    environment(randomCompFunc) = environment()
+    random_comps = aaply(1:iterations, 1, randomCompFunc, ..., .parallel = TRUE)
     significance <- sum(random_comps > obs_sim)/iterations
     return(c(SharedVariance = obs_sim, Prob = significance))
 }
@@ -32,8 +34,7 @@ KrzProjSignificance <- function(x, y, randomCompFunc = c("RandomMat", "RandomEV"
 
 ## 1) Random Matrices
 
-RandomMat <- function(index, x, y){
-    n = dim(x)[1]
+RandomMat <- function(index){
     rand_x <- RandomMatrix(n, variance = diag(x))
     rand_y <- RandomMatrix(n, variance = diag(y))
     KrzProjection(rand_x, rand_y)[[1]]
@@ -41,7 +42,7 @@ RandomMat <- function(index, x, y){
 
 ## 2) Random EigenVectors
 
-RandomEV <- function(index, x, y, size = TRUE){
+RandomEV <- function(index, size = TRUE){
     if(size) random_eVecs = qr.Q(qr(matrix(c(rep(1, n), rnorm(n*(n-1))), n, n)))
     else     random_eVecs = qr.Q(qr(matrix(rnorm(n*n), n, n)))
     rand_x =  t(random_eVecs) %*% evals %*% random_eVecs
@@ -50,8 +51,7 @@ RandomEV <- function(index, x, y, size = TRUE){
 
 ## 3) Shuffled eigenvectors
 
-ShuffleEV <- function(index, x, y){
-    n = dim(x)[1]
+ShuffleEV <- function(index){
     shuffle_x = sample(1:n, n)
     shuffle_y = sample(1:n, n)
     rand_x = t(eigen_x$vectors[,shuffle_x]) %*% diag(eigen_x$values) %*% eigen_x$vectors[,shuffle_x]
@@ -63,7 +63,7 @@ ShuffleEV <- function(index, x, y){
 
 ## 1) Random populations are shuffled
 
-ShufflePop <- function(index, x, y, sample.x = 100, sample.y = 100){
+ShufflePop <- function(index, sample.x = 100, sample.y = 100){
     pop_x = data.frame(mvtnorm::rmvnorm(n = sample.x, sigma = x))
     pop_x$'pop' = 'x'
     pop_y = data.frame(mvtnorm::rmvnorm(n = sample.y, sigma = y))
