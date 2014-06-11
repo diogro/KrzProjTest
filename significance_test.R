@@ -29,6 +29,14 @@ KrzProjSignificance <- function(x, y, randomCompFunc = c("RandomMat", "RandomEV"
     significance <- sum(random_comps > obs_sim)/iterations
     return(c(SharedVariance = obs_sim, Prob = significance))
 }
+rand_x = RandomMatrix(39, 100, 1, 10)
+rand_y = RandomMatrix(39, 100, 1, 10)
+sig_dist_RandMat = Map(function(x, y) KrzProjSignificance(x, y, 'RandomMat'), rand_x, rand_y)
+sig_dist_RandEV = Map(function(x, y) KrzProjSignificance(x, y, 'RandomEV'), rand_x, rand_y)
+sig_dist_ShuffleEV = Map(function(x, y) KrzProjSignificance(x, y, 'ShuffleEV'), rand_x, rand_y)
+sig_dist_ShufflePop = Map(function(x, y) KrzProjSignificance(x, y, 'ShufflePop'), rand_x, rand_x)
+save.image("./power.Rdata")
+
 
 ## Null hipotesis is dissimilarity
 
