@@ -18,7 +18,6 @@ funcSignificance <- function(x, y, randomCompFunc, ..., compFunc=KrzProjection, 
     significance <- sum(random_comps > obs_sim)/iterations
     return (c(SharedVariance = obs_sim, Prob = significance))
 }
-
 ## Null hipotesis is dissimilarity
 
 
@@ -90,7 +89,3 @@ sig_dist_RandMat = Map(function(x, y) funcSignificance(x, y, RandomMat, compFunc
 #sig_dist_ShuffleEV = Map(function(x, y) funcSignificance(x, y, ShuffleEV, eigen(x), eigen(y)), rand_x, rand_y)
 #sig_dist_ShufflePop = Map(function(x, y) funcSignificance(x, y, ShufflePop), rand_x, rand_x)
 save.image("./power.Rdata")
-
-
-
-
