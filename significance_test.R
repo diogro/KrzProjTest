@@ -2,10 +2,10 @@ require(gdata)
 require(ggplot2)
 require(reshape2)
 library(doMC)
-registerDoMC(12)
+registerDoMC(130)
 library(Morphometrics)
 
-load("~/Dropbox/labbio/cov_bayes_data/Rdatas/nwm.Rdata")
+load("~/labbio/cov_bayes_data/Rdatas/nwm.Rdata")
 cov.matrices = lapply(nwm.matrices, function(x) x[[1]])
 
 ###########################
@@ -81,8 +81,8 @@ ShufflePop <- function(x, y, compFunc=KrzProjection, sample.x = 100, sample.y = 
     return (compFunc(rand.P)[1,2])
 }
 
-rand_x = RandomMatrix(15, 2, 1, 10)
-rand_y = RandomMatrix(15, 2, 1, 10)
+rand_x = RandomMatrix(39, 100, 1, 10)
+rand_y = RandomMatrix(39, 100, 1, 10)
 
 sig_dist_RandMat = Map(function(x, y) funcSignificance(x, y, RandomMat, compFunc=PCAsimilarity), rand_x, rand_y)
 kr_sig_dist_RandMat = Map(function(x, y) funcSignificance(x, y, RandomMat), rand_x, rand_y)
