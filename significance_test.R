@@ -32,7 +32,7 @@ RandomMat <- function(x, y, compFunc=KrzProjection, ...){
 
 ## 2) Random EigenVectors
 
-RandomEV <- function(x, y, evals=NULL, compFunc=KrzProjection, size = TRUE){
+RandomEV <- function(x, y, compFunc=KrzProjection, evals=NULL, size = TRUE){
     n = dim(y)[1]
 
     if (is.null(evals))
@@ -49,7 +49,7 @@ RandomEV <- function(x, y, evals=NULL, compFunc=KrzProjection, size = TRUE){
 
 ## 3) Shuffled eigenvectors
 
-ShuffleEV <- function(x, y, eigen_x=NULL, eigen_y=NULL, compFunc=KrzProjection){
+ShuffleEV <- function(x, y, compFunc=KrzProjection, eigen_x=NULL, eigen_y=NULL){
     n = dim(x)[1]
 
     if (is.null(eigen_x))
@@ -84,9 +84,16 @@ ShufflePop <- function(x, y, compFunc=KrzProjection, sample.x = 100, sample.y = 
 rand_x = RandomMatrix(15, 2, 1, 10)
 rand_y = RandomMatrix(15, 2, 1, 10)
 
-sig_dist_RandMat = Map(function(x, y) funcSignificance(x, y, RandomMat, ret.dim=15, compFunc=PCAsimilarity), rand_x, rand_y)
-kr_sig_dist_RandMat = Map(function(x, y) funcSignificance(x, y, RandomMat, compFunc=KrzProjection), rand_x, rand_y)
-#sig_dist_RandEV = Map(function(x, y) funcSignificance(x, y, RandomEV, diag(eigen(x)$values)), rand_x, rand_y)
-#sig_dist_ShuffleEV = Map(function(x, y) funcSignificance(x, y, ShuffleEV, eigen(x), eigen(y)), rand_x, rand_y)
-#sig_dist_ShufflePop = Map(function(x, y) funcSignificance(x, y, ShufflePop), rand_x, rand_x)
+sig_dist_RandMat = Map(function(x, y) funcSignificance(x, y, RandomMat, compFunc=PCAsimilarity), rand_x, rand_y)
+kr_sig_dist_RandMat = Map(function(x, y) funcSignificance(x, y, RandomMat), rand_x, rand_y)
+
+sig_dist_RandEV = Map(function(x, y) funcSignificance(x, y, RandomEV, diag(eigen(x)$values), compFunc=PCAsimilarity), rand_x, rand_y)
+kr_sig_dist_RandEV = Map(function(x, y) funcSignificance(x, y, RandomEV, diag(eigen(x)$values)), rand_x, rand_y)
+
+sig_dist_ShuffleEV = Map(function(x, y) funcSignificance(x, y, ShuffleEV, eigen(x), eigen(y), compFunc=PCAsimilarity), rand_x, rand_y)
+kr_sig_dist_ShuffleEV = Map(function(x, y) funcSignificance(x, y, ShuffleEV, eigen(x), eigen(y)), rand_x, rand_y)
+
+sig_dist_ShufflePop = Map(function(x, y) funcSignificance(x, y, ShufflePop, compFunc=PCAsimilarity), rand_x, rand_x)
+kr_sig_dist_ShufflePop = Map(function(x, y) funcSignificance(x, y, ShufflePop), rand_x, rand_x)
+
 save.image("./power.Rdata")
