@@ -1,5 +1,6 @@
 # History files
 .Rhistory
+.ipynb_checkpoints/
 
 # Example code in package build process
 *-Ex.Rpower
